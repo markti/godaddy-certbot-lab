@@ -19,8 +19,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - id: terraform
-      name: Terraform Output
+    - name: Install certbot
+      run: |
+        apt update -y
+        apt install software-properties-common -y
+        apt update -y
+        apt install certbot -y
+
+    - name: Generate a certificate using godaddy
       env:
         CERTBOT_DOMAIN: ${{ github.event.inputs.environment }}
         API_KEY: ${{ vars.GODADDY_API_KEY }}
