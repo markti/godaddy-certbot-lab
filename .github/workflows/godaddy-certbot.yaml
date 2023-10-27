@@ -1,0 +1,33 @@
+name: Docker-WebApp
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain_name:
+        description: 'domain name to generate a certificate for'
+        type: string
+        required: true
+
+env:
+  TERRAFORM_VERSION: '1.5.7'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - id: terraform
+      name: Terraform Output
+      env:
+        CERTBOT_DOMAIN: ${{ github.event.inputs.environment }}
+        API_KEY: ${{ vars.GODADDY_API_KEY }}
+        API_SECRET: ${{ secrets.GODADDY_API_SECRET }}
+      run: |
+        certbot certonly --manual \
+          --preferred-challenges dns \
+          --manual-auth-hook ./certbot-godaddy-dns.sh \
+          --server https://acme.godaddy.com/v1/acme/directory \
+          -d $CERTBOT_DOMAIN
